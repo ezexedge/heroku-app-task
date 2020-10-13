@@ -8,8 +8,6 @@ const bcrypt = require('bcrypt-nodejs');
 const enviarEmail = require('../handlers/email');
 const sgMail = require("@sendgrid/mail")
 
-sgMail.setApiKey('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')
-
 // autenticar el usuario
 exports.autenticarUsuario = passport.authenticate('local', {
     successRedirect: '/', 
