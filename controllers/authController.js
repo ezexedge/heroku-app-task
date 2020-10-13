@@ -7,7 +7,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcrypt-nodejs');
 const enviarEmail = require('../handlers/email');
 const sgMail = require("@sendgrid/mail")
-
+//borrado
 // autenticar el usuario
 exports.autenticarUsuario = passport.authenticate('local', {
     successRedirect: '/', 
