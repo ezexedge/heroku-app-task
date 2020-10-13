@@ -7,7 +7,6 @@ const pug = require('pug');
 const juice = require('juice');
 const htmlToText = require('html-to-text');
 const util = require('util');
-sgMail.setApiKey('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')
 
 exports.formCrearCuenta = (req, res ) => {
     res.render('crearCuenta', {
@@ -25,62 +24,37 @@ exports.formIniciarSesion = (req, res) => {
 }
 
 
-
-exports.crearCuenta = (req, res) => {
+exports.crearCuenta = async (req, res) => {
     // leer los datos
     const { email, password} = req.body;
 
-    
-        // crear el usuario
-         Usuarios.create({
-            email, 
-            password
-        });
 
-        // crear una URL de confirmar
-        const confirmarUrl = `http://${req.headers.host}/confirmar/${email}`;
 
-        // crear el objeto de usuario
-        const usuario = {
-            email
-        }
+    const usuario = await Usuarios.findOne({where: { email: req.body.email} })
 
-        const emailData = {
-            from: 'no-reply@uptask.com',
-            to: usuario.email,
-            subject: `Account activation link`,
-            html: `
-                <h1>Please use the following link to activate your account</h1>
-                <p>${confirmarUrl}</p>
-                <hr />
-               
-            `
-        };
+    console.log('usuario  ...',usuario)
 
-        sgMail
-            .send(emailData)
-            .then(sent => {
-                 
-                 req.flash('correcto', 'Enviamos un correo, confirma tu cuenta');
-                 res.redirect('/iniciar-sesion');
-            })
-            .catch(err => {
-                // console.log('SIGNUP EMAIL SENT ERROR', err)
-                req.flash('error', error.errors.map(error => error.message));
-                res.render('crearCuenta', {
-                    mensajes: req.flash(),
-                    nombrePagina : 'Crear Cuenta en Uptask', 
-                    email,
-                    password
-                })
+    // si no existe el usuario
+    if(usuario) {
+        req.flash('error', 'El usuario esta registrado o tu email es incorrecto');
+        res.redirect('/crear-cuenta');
+        
+    }
 
 
 
-            });
+    const activo = 1
 
+    const usuarioNuevo = await Usuarios.create({email,password,activo})
+    await usuarioNuevo.save();
+
+    req.flash('correcto', 'Cuenta activada correctamente');
+    res.redirect('/iniciar-sesion');
               
        
 }
+
+
 
 exports.formRestablecerPassword = (req, res) => {
     res.render('reestablecer', {
